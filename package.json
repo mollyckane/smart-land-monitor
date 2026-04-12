@@ -1,0 +1,29 @@
+{
+  "name": "smart-land-monitor",
+  "version": "1.0.0",
+  "description": "Distributed Systems CA — Smart Land Health Monitoring Network supporting UN SDG 15: Life on Land",
+  "main": "index.js",
+  "scripts": {
+    "naming": "node naming/namingService.js",
+    "forest": "node services/forstService.js",
+    "soil": "node services/soilService.js",
+    "water": "node services/waterService.js",
+    "client": "node client/client.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mollyckane/smart-land-monitor.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mollyckane/smart-land-monitor/issues"
+  },
+  "homepage": "https://github.com/mollyckane/smart-land-monitor#readme",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.3",
+    "@grpc/proto-loader": "^0.8.0"
+  }
+}
