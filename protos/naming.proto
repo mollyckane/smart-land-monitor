@@ -1,0 +1,35 @@
+syntax="proto3";
+
+package naming;
+
+service NamingService{
+  rpc Register (RegisterRequest) returns (RegisterResponse){}
+  rpc Lookup (LookupRequest) returns (LookupResponse){}
+  rpc ListServices (ListRequest) returns (stream ServiceInfo){}
+}
+
+message RegisterRequest{
+  string name=1;
+  string address=2;
+}
+
+message RegisterResponse{
+  bool success=1;
+  string message=2;
+}
+
+message LookupRequest{
+  string name=1;
+}
+
+message LookupResponse{
+  string address=1;
+  bool found=2;
+}
+
+message ListRequest{}
+
+message ServiceInfo{
+  string name=1;
+  string address=2;
+}

@@ -1,0 +1,34 @@
+syntax="proto3";
+
+package soil;
+
+service SoilSensor{
+  rpc GetSoilStatus(SoilRequest) returns (SoilStatus){}
+  rpc  UploadHistoricalReadings(stream SoilReading) returns (AnalysisResult){}
+  rpc StreamZoneMonitor(SoilRequest) returns (stream SoilStatus){}
+}
+
+message SoilRequest{
+  string zone_id=1;
+}
+
+message SoilStatus{
+  string zone_id=1;
+  float moisture_percent=2;
+  string erosion_risk=3;
+  string soil_type=4;
+  string timestamp=5;
+}
+
+message SoilReading{
+  string zone_id=1;
+  float moisture_percent=2;
+  string timestamp=3;
+}
+
+message AnalysisResult{
+  float average_moisture=1;
+  string risk_summary=2;
+  int32 total_readings=3;
+  string zone_id=4;
+}

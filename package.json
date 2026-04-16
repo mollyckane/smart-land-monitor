@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "naming": "node naming/namingService.js",
-    "forest": "node services/forstService.js",
+    "forest": "node services/forestService.js",
     "soil": "node services/soilService.js",
     "water": "node services/waterService.js",
     "client": "node client/client.js"
