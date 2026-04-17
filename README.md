@@ -7,7 +7,7 @@
 ## Project Overview
 
 This application simulates a distributed network of smart environmental sensors
-deployed across a terrestrial ecosystem to monitor conditions, detect threats,
+deployed across a terrestrial ecosystem to monitor conditions, detect threats
 and support the United Nations Sustainable Development Goal 15: Life on Land.
 
 The system consists of three gRPC services that register with a central naming
@@ -86,18 +86,28 @@ Open a **separate terminal for each** of the following:
 
 ```bash
 # 1. Start the Naming Service first
+npm run naming
+# or 
 node naming/namingService.js
 
 # 2. Start the Forest Monitor
+npm run forest
+# or 
 node services/forestService.js
 
 # 3. Start the Soil Sensor
+npm run soil
+# or 
 node services/soilService.js
 
 # 4. Start the Freshwater Tracker
+npm run water
+# or 
 node services/waterService.js
 
 # 5. Launch the GUI Client
+npm run client
+# or 
 node client/guiClient.js
 ```
 
