@@ -4,7 +4,7 @@ const { time, clear } = require('console');
 var PROTO_PATH = require('path').join(__dirname, '../protos/forest.proto');
 
 var packageDefinition = protoLoader.loadSync(PROTO_PATH, {
-    keepCase: true,    // ✅ keeps co2_level as co2_level
+    keepCase: true,   
     longs: String,
     enums: String,
     defaults: true,
