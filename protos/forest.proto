@@ -1,4 +1,4 @@
-syntax="proto3"
+syntax="proto3";
 
 package forest;
 
@@ -14,21 +14,21 @@ message ForestRequest{
 
 message ForestReading{
   string location=1;
-  float humidity=2;
-  float co2_level=3;
-  float oxygen_level=4;
+  double humidity=2;
+  double co2_level=3;
+  double oxygen_level=4;
   string timestamp=5;
 }
 
 message AlertConfig{
   string location=1;
-  float humidity_threshold=2;
-  co2_threshold=3;
+  double humidity_threshold=2;
+  double co2_threshold=3;
 }
 
 message ForestAlert{
   string location=1;
   string message=2;
   string severity=3;
-  string timestamp;
+  string timestamp=4;
 }

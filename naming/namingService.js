@@ -17,11 +17,11 @@ function Register(call, callback){
             return callback({code: grpc.status.INVALID_ARGUMENT, message: 'Name and address are required'});
         }
         registry[name] = address;
-        console.log(`[Naming Service] Registered: ${name} at ${address}`);
+        console.log(`[NamingService] Registered: ${name} at ${address}`);
         callback(null, { success: true, message: `${name}  registered successfully at ${address}` });
     }
     catch(error){
-        console.error('[Naming Service] Error registering service:', error);
+        console.error('[NamingService] Error registering service:', error);
         callback({code: grpc.status.INTERNAL, message: 'Internal server error'});
     }
 }
@@ -31,14 +31,14 @@ function Lookup(call, callback){
         const { name } = call.request;
         const address = registry[name];
         if(!address){
-            console.log(`[Naming Service] Lookup failed for: ${name}, not found.`);
+            console.log(`[NamingService] Lookup failed for: ${name}, not found.`);
             return callback({code: grpc.status.NOT_FOUND, message: `${name} not found.`});
         }
-        console.log(`[Naming Service] Lookup successful for: ${name}, address: ${address}`);
+        console.log(`[NamingService] Lookup successful for: ${name}, address: ${address}`);
         callback(null, { address });
     }
     catch(error){
-        console.error('[Naming Service] Error looking up service:', error);
+        console.error('[NamingService] Error looking up service:', error);
         callback({code: grpc.status.INTERNAL, message: 'Internal server error'});
     }
 }
@@ -46,11 +46,11 @@ function Lookup(call, callback){
 function ListServices(call, callback){
     try{
         const entries = Object.entries(registry);
-        console.log(`[Naming Service] Listing services: ${entries.length} service(s) found.`);
+        console.log(`[NamingService] Listing services: ${entries.length} service(s) found.`);
         callback(null, { services: entries });
     }
     catch(error){
-        console.error('[Naming Service] Error listing services:', error);
+        console.error('[NamingService] Error listing services:', error);
         callback({code: grpc.status.INTERNAL, message: 'Internal server error'});
     }
 }
@@ -60,9 +60,9 @@ server.addService(naming_proto.NamingService.service, { Register, Lookup, ListSe
 
 server.bindAsync("0.0.0.0:50051", grpc.ServerCredentials.createInsecure(), function(err, port){
     if(err){
-        console.error('[Naming Service] Server binding ERROR:', err);
+        console.error('[NamingService] Server binding ERROR:', err);
         process.exit(1);
         return;
     }
-    console.log('[Naming Service] Server listening on port:', port);
+    console.log('[NamingService] Server listening on port:', port);
 })
