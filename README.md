@@ -26,24 +26,26 @@ acts as a mission control dashboard to control and monitor all services.
 ---
 
 ## Project Structure
-
-smart-land-monitor/  \
-├── README.md  \
-├── package.json  \
-├── protos/  \
- │ ├── naming.proto  \
-│ ├── forest.proto  \
-│ ├── soil.proto  \
-│ └── water.proto  \
-├── naming/  \
-│ └── namingService.js  \
-├── services/  \
-│ ├── forestService.js  \
-│ ├── soilService.js  \
-│ └── waterService.js  \
-└── client/  \
-└── guiClient.js
-
+```
+smart-land-monitor/
+├── .gitignore
+├── client/
+│   └── guiClient.js
+├── naming/
+│   └── namingService.js
+├── package-lock.json
+├── package.json
+├── protos/
+│   ├── forest.proto
+│   ├── naming.proto
+│   ├── soil.proto
+│   └── water.proto
+├── README.md
+└── services/
+    ├── forestService.js
+    ├── soilService.js
+    └── waterService.js
+```
 
 ---
 
