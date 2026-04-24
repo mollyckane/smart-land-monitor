@@ -1,6 +1,6 @@
 var grpc = require('@grpc/grpc-js');
 var protoLoader = require('@grpc/proto-loader');
-const { time, clear } = require('console');
+// const { time, clear } = require('console');
 var PROTO_PATH = require('path').join(__dirname, '../protos/forest.proto');
 
 var packageDefinition = protoLoader.loadSync(PROTO_PATH, {
@@ -72,6 +72,7 @@ function GetCurrentReading(call, callback){
 
 //2. Server Streaming RPC: StreamReadings
 function StreamLiveReadings(call){
+    let interval;
     try{
         const { location } = call.request;
         
@@ -84,14 +85,16 @@ function StreamLiveReadings(call){
             return;
         }
         const normalisedLocation=location.toLowerCase();
-        console.log(`[Forest Service] Streaming Live Readinfs started for ${normalisedLocation}`); 
+        console.log(`[Forest Service] Streaming Live Readings started for ${normalisedLocation}`); 
 
         //send a reading every 5 seconds
         let count=0;
+        const MAX_READINGS=8;
 
-        const interval = setInterval(()=>{
+        interval = setInterval(()=>{
             try{
-                if (count >= 8) {
+                //end streaming once it reaches max readings7
+                if (count >= MAX_READINGS) {
                     clearInterval(interval);
                     call.end();
                     console.log(`[ForestService] Streaming Live Readings completed for ${normalisedLocation}`);
@@ -109,7 +112,7 @@ function StreamLiveReadings(call){
 
                 call.write(reading);
 
-                console.log(`[ForestService] Streamed reading ${++count}/10 for ${normalisedLocation}`);              
+                console.log(`[ForestService] Streamed reading ${++count}/${MAX_READINGS} for ${normalisedLocation}`);              
             }
             catch(error){
                 console.error('[ForestService] Error streaming reading:', error);
@@ -251,10 +254,12 @@ function main(){
             return;
         }
         console.log('[ForestService] Server listening on port: ', port);
+        server.start();
 
         //register with naming service after server starts
         registerWithNamingService();
     });
+
 }
 
 main();
