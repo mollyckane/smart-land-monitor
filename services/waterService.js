@@ -147,9 +147,8 @@ function StreamWaterLevels(call){
                     return;
                 }
 
-                const status=generateWaterQuality(source_id);
                 const reading={
-                    source_id: status.source_id,
+                    source_id,
                     level_metres: parseFloat((6.5 + Math.random() * 2).toFixed(2)),
                     timestamp:  new Date().toISOString()
                 };
@@ -187,15 +186,14 @@ function PollutionAlertChannel(call) {
         console.log('[Water] Pollution Alert Channel activated...');
 
         call.on('data', (config) => {
-            const { source_id, pollution_threshold } = config;
+            const { source_id, alert_threshold_ppm } = config;
             const status = generateWaterQuality(source_id);
 
-            if (status.turbidity > pollution_threshold) {
+            if (status.pollutant_ppm >alert_threshold_ppm) {
                 call.write({
-                    source_id,
-                    message: `Turbidity level ${status.turbidity} NTU exceeds threshold of ${pollution_threshold} NTU`,
-                    severity: (status.turbidity - pollution_threshold > 5) ? 'HIGH' : 'MEDIUM',
-                    timestamp: new Date().toISOString()
+                    event_id: `EVT-${Date.now()}`,
+                    readings_logged: 1,
+                    max_pollutant: status.pollutant_ppm
                 });
             }
         });
@@ -210,8 +208,7 @@ function PollutionAlertChannel(call) {
         });
     }
     catch(error){
-        console.error('[Soil] Error in PollutionAlertChannel:', error);
-        clearInterval(interval);
+        console.error('[Water] Error in PollutionAlertChannel:', error);
         call.destroy({
             code: grpc.status.INTERNAL,
             message: 'Internal server error'
