@@ -3,8 +3,8 @@ syntax="proto3";
 package water;
 
 service WaterMonitor{
-  rpc WaterQuality(WaterRequest) returns (WaterQuality){}
-  rpc PollutionReport(stream PollutionReading) returns (PollutionAlert){}
+  rpc GetWaterQuality(WaterRequest) returns (WaterQuality){}
+  rpc ReportPollutionEvent(stream PollutionReading) returns (PollutionAlert){}
   rpc StreamWaterLevels(WaterRequest) returns (stream WaterLevel){}
   rpc PollutionAlertChannel(stream MonitorRequest) returns (stream PollutionAlert){}
 }
@@ -14,15 +14,15 @@ message WaterRequest{
 }
 
 message WaterQuality{
-  float ph_level=1;
-  float pollutant_ppm=2;
-  float flow_rate=3;
+  double ph_level=1;
+  double pollutant_ppm=2;
+  double flow_rate=3;
   string status=4;
 }
 
 message PollutionReading{
   string source_id=1;
-  float pollutant_ppm=2;
+  double pollutant_ppm=2;
   string timestamp=3;
 }
 
@@ -34,12 +34,12 @@ message PollutionAlert{
 
 message WaterLevel{
   string source_id=1;
-  float level_metres=2;
+  double level_metres=2;
   string timestamp=3;
 }
 
 message MonitorRequest{
   string source_id=1;
-  float alert_threshold_ppm=2;
+  double alert_threshold_ppm=2;
   string message=3;
 }

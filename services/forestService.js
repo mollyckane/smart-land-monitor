@@ -46,7 +46,10 @@ function GetCurrentReading(call, callback){
 
         //guard clause for error handling
         if(!location){
-            return callback({code: grpc.status.INVALID_ARGUMENT, message: 'Location is required'});
+            return callback({
+                code: grpc.status.INVALID_ARGUMENT, 
+                message: 'Location is required'
+            });
         }
 
         const data = getForestData(location);
@@ -66,7 +69,10 @@ function GetCurrentReading(call, callback){
     }
     catch(error){
         console.error('[ForestService] Error in GetCurrentReading:', error);
-        callback({code: grpc.status.INTERNAL, message: 'Internal server error'});   
+        callback({
+            code: grpc.status.INTERNAL, 
+            message: 'Internal server error'
+        });   
     }
 }
 
@@ -233,7 +239,7 @@ function registerWithNamingService(callback){
         );
     }
     catch(error){
-        console.error('[ForestService] Error registering with Naming Service:', error);
+        console.error('[ForestService] Error registering with Naming Service: ', error);
     }
 } 
 
