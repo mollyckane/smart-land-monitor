@@ -8,7 +8,7 @@
     "forest": "node services/forestService.js",
     "soil": "node services/soilService.js",
     "water": "node services/waterService.js",
-    "client": "node client/client.js"
+    "web-client": "node web-client/bin/www"
   },
   "repository": {
     "type": "git",

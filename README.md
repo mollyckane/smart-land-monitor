@@ -107,10 +107,10 @@ npm run water
 # or 
 node services/waterService.js
 
-# 5. Launch the GUI Client
-npm run client
+# 5. Launch the GUI  Web Client
+npm run web-client
 # or 
-node client/guiClient.js
+node web-client/bin/www
 ```
 
 ---
