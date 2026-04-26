@@ -1,12 +1,147 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Smart Land Monitor</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-    werk
-  </body>
+
+<head>
+  <title>Smart Land Monitor</title>
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="logo"><img src="https://img.icons8.com/?size=100&id=12198&format=png&color=000000" class="icons">
+        Smart Land Health Monitor</div>
+      <div class="subtitle">UN SDG 15: Life on Land | Distributed Systems CA</div>
+      <!-- discover services button -->
+    </div>
+  </header>
+  <main>
+    <!-- Services Status Bar -->
+    <section class="status-bar">
+      <div class="status-item" id="status-forest"><img
+          src="https://img.icons8.com/?size=100&id=17593&format=png&color=000000" class="icons"> Forest Monitor <span
+          class="badge badge-unknown">Unknown</span></div>
+      <div class="status-item" id="status-soil"><img
+          src="https://img.icons8.com/?size=100&id=WdpOiowt42I7&format=png&color=000000" class="icons"> Soil Sensor
+        <span class="badge badge-unknown">Unknown</span>
+      </div>
+      <div class="status-item" id="status-water"><img
+          src="https://img.icons8.com/?size=100&id=13101&format=png&color=000000" class="icons"> Water Tracker <span
+          class="badge badge-unknown">Unknown</span></div>
+      <div class="status-item" id="status-naming"><img
+          src="https://img.icons8.com/?size=100&id=110286&format=png&color=000000" class="icons"> Naming Service <span
+          class="badge badge-unknown">Unknown</span></div>
+    </section>
+
+    <!-- service cards section -->
+    <section class="card-grid">
+      <!-- FOREST -->
+      <div class="card forest green">
+        <div class="card-header">
+          <span class="card-icon green"><img src="https://img.icons8.com/?size=100&id=17593&format=png&color=000000"
+              class="icons"></span>
+          <div>
+            <h2>Forest Monitor</h2>
+            <p class="card-desc">Humidity, CO₂ & Oxygen levels</p>
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label>Forest Zone</label>
+          <input type="text" id="forest-location" value="Amazon Rainforest" placeholder="e.g. Amazon">
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-green" onclick="getForestReading()">📊 Get Reading</button>
+          <button class="btn btn-blue" onclick="streamForest()">📡 Live Stream</button>
+        </div>
+
+        <div class="output" id="forest-output">
+          <p class="placeholder">Click a button to get data...</p>
+        </div>
+      </div>
+      <!-- FOREST end -->
+
+      <!-- SOIL -->
+      <div class="card soil amber">
+        <div class="card-header">
+          <span class="card-icon amber"><img src="https://img.icons8.com/?size=100&id=WdpOiowt42I7&format=png&color=000000"
+              class="icons"></span>
+          <div>
+            <h2>Soil Sensor</h2>
+            <p class="card-desc">Moisture levels & erosion risk</p>
+          </div>
+        </div>
+      
+        <div class="input-group">
+          <label>Land Zone</label>
+          <input type="text" id="soil-zone" value="ZoneB" placeholder="e.g. ZoneB">
+        </div>
+      
+        <div class="btn-group">
+          <button class="btn btn-green" onclick="getSoilStatus()">📊 Get Status</button>
+          <button class="btn btn-blue" onclick="streamSoil()">📡 Live Stream</button>
+          <button class="btn btn-orange" onclick="uploadSoilData()">📤 Upload History</button>
+        </div>
+      
+        <div class="output" id="soil-output">
+          <p class="placeholder">Click a button to get data...</p>
+        </div>
+      </div>
+      <!-- SOIL end -->
+
+      <!-- WATER -->
+      <div class="card water">
+        <div class="card-header">
+          <span class="card-icon blue"><img src="https://img.icons8.com/?size=100&id=13101&format=png&color=000000" class="icons"></span>
+          <div>
+            <h2>Water Monitor</h2>
+            <p class="card-desc">Water quality & pollution detection</p>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Water Source</label>
+          <input type="text" id="water-source" value="RiverAlpha" placeholder="e.g. RiverAlpha">
+        </div>
+      
+        <div class="input-group">
+          <label>Pollutant Level (ppm)</label>
+          <input type="number" id="water-pollutant" value="8.5" step="0.1" placeholder="e.g. 8.5">
+        </div>
+        
+        <div class="input-group">
+          <label>Number of Readings to Report</label>
+          <input type="number" id="water-readings" value="3" min="1" max="10" placeholder="e.g. 3">
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-green" onclick="getWaterQuality()">📊 Get Quality</button>
+          <button class="btn btn-blue" onclick="streamWater()">📡 Stream Levels</button>
+          <button class="btn btn-red" onclick="reportPollution()">⚠️ Report Pollution</button>
+        </div>
+
+        <div class="output" id="water-output">
+          <p class="placeholder">Click a button to get data...</p>
+        </div>
+      </div>
+      <!-- WATER end -->
+       <!-- NAMING -->
+      <div class="card card-full naming">
+        <div class="card-header">
+          <span class="card-icon">🗂️</span>
+          <div>
+            <h2>Naming Service Registry</h2>
+            <p class="card-desc">All registered services in the network</p>
+          </div>
+        </div>
+        <div class="output" id="naming-output">
+          <p class="placeholder">Click "Discover Services" in the header to list all registered services...</p>
+        </div>
+      </div>
+    </section>
+    
+  </main>
+</body>
+
 </html>
