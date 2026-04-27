@@ -63,12 +63,12 @@ function GetCurrentReading(call, callback){
         };
 
         //log in console
-        console.log(`[ForestService] Current reading for ${location}: Humidity: ${reading.humidity}%, CO2: ${reading.co2_level}ppm, O2: ${reading.oxygen_level}% at ${reading.timestamp}`);
+        console.log(`[Forest] Current reading for ${location}: Humidity: ${reading.humidity}%, CO2: ${reading.co2_level}ppm, O2: ${reading.oxygen_level}% at ${reading.timestamp}`);
 
         callback(null, reading);
     }
     catch(error){
-        console.error('[ForestService] Error in GetCurrentReading:', error);
+        console.error('[Forest] Error in GetCurrentReading:', error);
         callback({
             code: grpc.status.INTERNAL, 
             message: 'Internal server error'
@@ -103,7 +103,7 @@ function StreamLiveReadings(call){
                 if (count >= MAX_READINGS) {
                     clearInterval(interval);
                     call.end();
-                    console.log(`[ForestService] Streaming Live Readings completed for ${normalisedLocation}`);
+                    console.log(`[Forest] Streaming Live Readings completed for ${normalisedLocation}`);
                     return;
                 }
 
@@ -118,10 +118,10 @@ function StreamLiveReadings(call){
 
                 call.write(reading);
 
-                console.log(`[ForestService] Streamed reading ${++count}/${MAX_READINGS} for ${normalisedLocation}`);              
+                console.log(`[Forest] Streamed reading ${++count}/${MAX_READINGS} for ${normalisedLocation}`);              
             }
             catch(error){
-                console.error('[ForestService] Error streaming reading:', error);
+                console.error('[Forest] Error streaming reading:', error);
                 clearInterval(interval);
                 call.destroy({
                     code: grpc.status.INTERNAL,
@@ -133,12 +133,12 @@ function StreamLiveReadings(call){
         //client disconnects early
         call.on('cancelled',()=>{
             clearInterval(interval);
-            console.log(`[ForestService] Streaming Live Readings cancelled by client for ${normalisedLocation}`);
+            console.log(`[Forest] Streaming Live Readings cancelled by client for ${normalisedLocation}`);
         });
     }
     catch(error){
         clearInterval(interval);
-        console.error('[ForestService] Error in StreamLiveReadings:', error);
+        console.error('[Forest] Error in StreamLiveReadings:', error);
         call.destroy({code: grpc.status.INTERNAL, message: 'Internal server error'});
     }
 }
@@ -146,7 +146,7 @@ function StreamLiveReadings(call){
 //3. Bidirectional Streaming RPC: MonitorAlertChannel
 function MonitorAlertChannel(call){
     try{
-        console.log('[ForestService] MonitorAlertChannel bidirectional stream started');
+        console.log('[Forest] MonitorAlertChannel bidirectional stream started');
 
         call.on('data', (request)=>{
             try{
@@ -166,7 +166,7 @@ function MonitorAlertChannel(call){
             const normalisedLocation=location.toLowerCase();
             const data = getForestData(normalisedLocation);
 
-            console.log(`[ForestService] MonitorForest checking thresholds for ${normalisedLocation}`);
+            console.log(`[Forest] MonitorForest checking thresholds for ${normalisedLocation}`);
 
              //check the humidity levels
             if(data.humidity < humidity_threshold){
@@ -189,7 +189,7 @@ function MonitorAlertChannel(call){
              }
             }
             catch(error){
-                console.error('[ForestService] Error processing MonitorAlertChannel data:', error);
+                console.error('[Forest] Error processing MonitorAlertChannel data:', error);
                 call.write({
                     location: 'unknown',
                     message: 'Error processing request',
@@ -200,16 +200,16 @@ function MonitorAlertChannel(call){
         });
 
         call.on('end',()=>{
-            console.log('[ForestService] MonitorAlertChannel bidirectional stream ended by client');
+            console.log('[Forest] MonitorAlertChannel bidirectional stream ended by client');
             call.end();
         });
 
         call.on('error',(error)=>{
-            console.error('[ForestService] MonitorAlertChannel stream error:', error);
+            console.error('[Forest] MonitorAlertChannel stream error:', error);
         });
     }
     catch(error){
-        console.error('[ForestService] Error in MonitorAlertChannel:', error);
+        console.error('[Forest] Error in MonitorAlertChannel:', error);
     }
 }
 
@@ -229,17 +229,17 @@ function registerWithNamingService(callback){
             { deadline },
             (err, response) =>{
                 if(err){
-                    console.error('[ForestService] Could not register with Naming Service: ', err);
-                    console.warn('[ForestService] WARNING: Service will not be discoverable by clients');
+                    console.error('[Forest] Could not register with Naming Service: ', err);
+                    console.warn('[Forest] WARNING: Service will not be discoverable by clients');
                     return;
 
                 }
-                console.log('[ForestService] Successfully registered with Naming Service:', response.message);
+                console.log('[Forest] Successfully registered with Naming Service:', response.message);
             }
         );
     }
     catch(error){
-        console.error('[ForestService] Error registering with Naming Service: ', error);
+        console.error('[Forest] Error registering with Naming Service: ', error);
     }
 } 
 
@@ -255,12 +255,12 @@ function main(){
 
     server.bindAsync('0.0.0.0:50052', grpc.ServerCredentials.createInsecure(), (err, port)=>{
         if(err){
-            console.error('[ForestService] Server binding ERROR:', err);
+            console.error('[Forest] Server binding ERROR:', err);
             process.exit(1);
             return;
         }
-        console.log('[ForestService] Server listening on port: ', port);
-        server.start();
+        console.log('[Forest] Server listening on port: ', port);
+        // server.start(); not needed according to terminal
 
         //register with naming service after server starts
         registerWithNamingService();

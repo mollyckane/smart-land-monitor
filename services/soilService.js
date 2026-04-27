@@ -265,7 +265,7 @@ function main(){
             return;
         }
         console.log('[Soil] Server listening on port: ', port);
-        server.start();
+        // server.start(); not needed according to terminal
 
         //register with naming service after server starts
         registerWithNamingService();

@@ -233,7 +233,7 @@ function registerWithNamingService(callback){
             (err, response)=>{
                 if(err){
                     console.error('[Water] Could not register with Naming Service: ', err);
-                    console.warn('[ForestService] WARNING: Service will not be discoverable by clients');
+                    console.warn('[Forest] WARNING: Service will not be discoverable by clients');
                     return;
                 }
                 console.log('[Water] Successfully registered with Naming Service');
@@ -263,7 +263,7 @@ function main(){
             return;
         }
         console.log('[Water] Server listening on port: ', port);
-        server.start();
+        // server.start(); not needed according to terminal
 
         //register with naming service after server starts
         registerWithNamingService();
