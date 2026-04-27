@@ -4,11 +4,7 @@ var PROTO_PATH =  require('path').join(__dirname, '../protos/naming.proto');
 var packageDefinition = protoLoader.loadSync(PROTO_PATH);
 var naming_proto = grpc.loadPackageDefinition(packageDefinition).naming;
 
-const registry={
-    "ForestService":"localhost:50052",
-    "SoilSensor":"localhost:50053",
-    "WaterService":"localhost:50054"
-};
+const registry=[];
 
 function Register(call, callback){
     try{
@@ -26,33 +22,21 @@ function Register(call, callback){
     }
 }
 
-function Lookup(call, callback){
-    try{
-        const { name } = call.request;
-        const address = registry[name];
-        if(!address){
-            console.log(`[NamingService] Lookup failed for: ${name}, not found.`);
-            return callback({code: grpc.status.NOT_FOUND, message: `${name} not found.`});
-        }
-        console.log(`[NamingService] Lookup successful for: ${name}, address: ${address}`);
-        callback(null, { address });
+function Lookup(call, callback) {
+    const { name } = call.request;
+    const address = registry[name];
+    if (!address) {
+        console.log(`[NamingService] Lookup FAILED: ${name} not found`);
+        return callback(null, { address: '', found: false });
     }
-    catch(error){
-        console.error('[NamingService] Error looking up service:', error);
-        callback({code: grpc.status.INTERNAL, message: 'Internal server error'});
-    }
+    console.log(`[NamingService] Lookup successful for: ${name}, address: ${address}`);
+    callback(null, { address, found: true });
 }
-
-function ListServices(call, callback){
-    try{
-        const entries = Object.entries(registry);
-        console.log(`[NamingService] Listing services: ${entries.length} service(s) found.`);
-        callback(null, { services: entries });
-    }
-    catch(error){
-        console.error('[NamingService] Error listing services:', error);
-        callback({code: grpc.status.INTERNAL, message: 'Internal server error'});
-    }
+function ListServices(call) {
+    const entries = Object.entries(registry);
+    console.log(`[Naming Service] Listing ${entries.length} service(s)`);
+    entries.forEach(([name, address]) => call.write({ name, address }));
+    call.end();
 }
 
 var server = new grpc.Server();
