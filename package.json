@@ -4,7 +4,7 @@
   "description": "Distributed Systems CA — Smart Land Health Monitoring Network supporting UN SDG 15: Life on Land",
   "main": "index.js",
   "scripts": {
-    "naming": "node naming/namingService.js",
+    "naming": "node services/namingService.js",
     "forest": "node services/forestService.js",
     "soil": "node services/soilService.js",
     "water": "node services/waterService.js",
