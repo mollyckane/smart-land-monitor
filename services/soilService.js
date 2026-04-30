@@ -86,7 +86,7 @@ function UploadReadingHistory(call, callback){
                     return;
                 }
                 readings.push(reading);
-                console.log(`[Soil] Received reading for Zone:${reading.zone_id}, Moisture: ${reading.moisture_percent}%, pH: ${reading.soil_ph}, Time: ${readings.timestamp}`);
+                console.log(`[Soil] Received reading for Zone:${reading.zone_id}, Moisture: ${reading.moisture_percent}%, pH: ${reading.soil_ph}, Time: ${reading.timestamp}`);
             }
             catch(error){
                 console.error('[Soil] Error processing uploaded reading:', error);

@@ -99,7 +99,7 @@ function StreamLiveReadings(call){
 
         interval = setInterval(()=>{
             try{
-                //end streaming once it reaches max readings7
+                //end streaming once it reaches max readings
                 if (count >= MAX_READINGS) {
                     clearInterval(interval);
                     call.end();
