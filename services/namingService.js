@@ -18,7 +18,10 @@ function Register(call, callback){
     try{
         const { name, address } = call.request;
         if(!name || !address){
-            return callback({code: grpc.status.INVALID_ARGUMENT, message: 'Name and address are required'});
+            return callback({
+                code: grpc.status.INVALID_ARGUMENT, 
+                message: 'Name and address are required'
+            });
         }
         registry[name] = address;
         console.log(`[NamingService] Registered: ${name} at ${address}`);
@@ -26,7 +29,10 @@ function Register(call, callback){
     }
     catch(error){
         console.error('[NamingService] Error registering service:', error);
-        callback({code: grpc.status.INTERNAL, message: 'Internal server error'});
+        callback({
+            code: grpc.status.INTERNAL, 
+            message: 'Internal server error'
+        });
     }
 }
 
@@ -65,9 +71,10 @@ function ListServices(call) {
         entries.forEach(([name, address]) => {
             call.write({ name, address });
         });
+        call.end();
     }
     catch(error){
-        console.error('[NamingService} Error in ListServices:', error);
+        console.error('[NamingService] Error in ListServices:', error);
         call.destroy({
             code: grpc.status.INTERNAL,
             message: 'Internal server error'
