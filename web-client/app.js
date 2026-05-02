@@ -56,17 +56,6 @@ function sendSseEvent(clients, payload) {
     });
 }
 
-//helper method for metadata and deadline
-function createGrpcContext(type = 'rpc') {
-    const metadata = new grpc.Metadata();
-    metadata.add('client', 'gui-dashboard');
-    metadata.add('request-type', type);
-
-    const deadline = new Date();
-    deadline.setSeconds(deadline.getSeconds() + 5);
-
-    return { metadata, options: { deadline } };
-}
 
 //------ discover services --------
 function discoverServices() {
@@ -129,12 +118,8 @@ app.post('/forest/reading', (req, res) => {
     if (!forestClient) return res.status(503).json({ error: 'Forest Monitor not available' });
     const location = req.body.location || 'Amazon Rainforest';
 
-    const { metadata, options } = createGrpcContext('unary');
-
     forestClient.GetCurrentReading(
         { location },
-        metadata,
-        options,
         (err, response) => {
             if (err) return res.status(500).json({ error: err.message });
         res.json(response);
@@ -150,12 +135,8 @@ app.get('/forest/stream', (req, res) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    const { metadata, options } = createGrpcContext('stream');
-
     const call = forestClient.StreamLiveReadings(
-        { location },
-        metadata,
-        options
+        { location }
     );
 
     call.on('data', (reading) => {
@@ -186,12 +167,7 @@ app.get('/forest/alerts', (req, res) => {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
 
-    const { metadata, options } = createGrpcContext('bidi');
-
-    const call = forestClient.MonitorAlertChannel(
-        metadata,
-        options
-    );
+    forestAlertCall = forestClient.MonitorAlertChannel();
 
     forestAlertCall.on('data', function (alert) {
         res.write(`data: ${JSON.stringify(alert)}\n\n`);
@@ -239,12 +215,8 @@ app.post('/soil/status', (req, res) => {
     if (!soilClient) return res.status(503).json({ error: 'Soil Sensor not available' });
     const zone_id = req.body.zone_id || 'ZoneB';
 
-    const { metadata, options } = createGrpcContext('unary');
-
     soilClient.GetSoilStatus(
         { zone_id },
-        metadata,
-        options,
         (err, response) => {
             if (err) return res.status(500).json({ error: err.message });
             res.json(response);
@@ -260,12 +232,8 @@ app.get('/soil/stream', (req, res) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    const { metadata, options } = createGrpcContext('stream');
-
     const call = soilClient.StreamZoneMonitor(
-        { zone_id },
-        metadata,
-        options
+        { zone_id }
     );
 
     call.on('data', (status) => {
@@ -289,14 +257,10 @@ app.post('/soil/upload', (req, res) => {
     if (!soilClient) return res.status(503).json({ error: 'Soil Sensor not available' });
     const zone_id = req.body.zone_id || 'ZoneB';
 
-    const { metadata, options } = createGrpcContext('client-stream');
-
     const call = soilClient.UploadReadingHistory(
-        metadata,
-        options,
         (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
-        res.json(result);
+            res.json(result);
     });
 
     //simulate streaming 5 historical readings to the service
@@ -317,12 +281,8 @@ app.post('/water/quality', (req, res) => {
     if (!waterClient) return res.status(503).json({ error: 'Water Tracker not available' });
     const source_id = req.body.source_id || 'RiverAlpha';
 
-    const { metadata, options } = createGrpcContext('unary');
-
     waterClient.GetWaterQuality(
         { source_id },
-        metadata,
-        options,
         (err, response) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(response);
@@ -338,12 +298,8 @@ app.get('/water/stream', (req, res) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    const { metadata, options } = createGrpcContext('stream');
-
     const call = waterClient.StreamWaterLevels(
-        { source_id },
-        metadata,
-        options
+        { source_id }
     );
 
     call.on('data', (level) => {
@@ -370,10 +326,7 @@ app.post('/water/pollution', (req, res) => {
     const pollutant = parseFloat(req.body.pollutant_ppm) || 8.5;
     const count = parseInt(req.body.count) || 3;
 
-    const { metadata, options } = createGrpcContext('client-stream');
     const call = waterClient.ReportPollutionEvent(
-        metadata,
-        options,
         (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(result);
@@ -397,11 +350,7 @@ app.get('/water/alerts', (req, res) => {
         return res.status(503).json({ error: 'Water Tracker not available' });
     }
 
-    const { metadata, options } = createGrpcContext('bidi');
-
     waterAlertCall = waterClient.PollutionAlertChannel(
-        metadata,
-        options
     );
 
     res.setHeader('Content-Type', 'text/event-stream');
@@ -451,9 +400,7 @@ app.post('/water/alerts', (req, res) => {
 app.get('/services/list', (req, res) => {
     const services = [];
 
-    const { metadata, options } = createGrpcContext('stream');
-
-    const call = namingClient.ListServices({}, metadata, options);
+    const call = namingClient.ListServices({});
 
     call.on('data', (service) => services.push(service));
     call.on('end', () => res.json(services));
