@@ -59,69 +59,7 @@ function GetWaterQuality(call, callback){
     }
 }
 
-//RPC 2: Client Streaming - PollutionReport
-function ReportPollutionEvent(call, callback){
-    try{
-        console.log('[Water] Receiving pollution reports from client...');
-
-        const readings = [];
-        let reportCount = 0;
-        call.on('data', (report) => {
-            try{
-                if (!report.source_id) {
-                    console.warn('[Water] Received reading with missing source_id');
-                    return;
-                }
-                readings.push(report);
-                console.log(`[Water] Received pollution report #${++reportCount}: Source: ${report.source_id}, Pollutant: ${report.pollutant_ppm}`);
-            }
-            catch(error){
-                console.error('[Water] Error processing uploaded reports: ', error);
-            }    
-        });
-
-        call.on('end', () => {
-            try{
-                console.log(`[Water] Completed receiving pollution reports. Total reports: ${reportCount}`);
-
-                if (reportCount === 0) {
-                    return callback({
-                        code: grpc.status.INVALID_ARGUMENT,
-                        message: 'No readings received'
-                    });
-                }
-                const max_pollutant = Math.max(...readings.map(r => r.pollutant_ppm));
-                const event_id = `EVT-${Date.now()}`;
-                console.log(`[Water] Event logged: ${event_id} reported with max pollutant level: ${max_pollutant}ppm`);
-
-                callback(null, { 
-                    event_id, 
-                    readings_logged: reportCount, 
-                    max_pollutant: parseFloat(max_pollutant.toFixed(2)) 
-                });
-            }
-            catch(error){
-                console.error('[Water] Error analysing ReportPollutionEvent stream:', error);
-                callback({
-                    code: grpc.status.INTERNAL,
-                    message: 'Internal server error while analysing readings'
-                });
-            }
-        });
-        call.on('error', (err) => {
-            console.error(`[Water] Error receiving pollution reports: ${err.message}`); 
-        });
-    }
-    catch(error){
-        console.error('[Water] Error processing ReportPollutionEvent data: ', error);
-        callback({
-            code: grpc.status.INTERNAL,
-            message: 'Internal server error'
-        });
-    }     
-}
-
-//RPC 3: Server Streaming RPC - StreamWaterLevels
+//RPC 2: Server Streaming RPC - StreamWaterLevels
 function StreamWaterLevels(call){
     let interval;
     try{
@@ -174,6 +112,68 @@ function StreamWaterLevels(call){
         console.error('[Water] Error in StreamWaterLevels: ', error);
         clearInterval(interval);
         call.destroy({
+            code: grpc.status.INTERNAL,
+            message: 'Internal server error'
+        });
+    }
+}
+
+//RPC 3: Client Streaming - PollutionReport
+function ReportPollutionEvent(call, callback) {
+    try {
+        console.log('[Water] Receiving pollution reports from client...');
+
+        const readings = [];
+        let reportCount = 0;
+        call.on('data', (report) => {
+            try {
+                if (!report.source_id) {
+                    console.warn('[Water] Received reading with missing source_id');
+                    return;
+                }
+                readings.push(report);
+                console.log(`[Water] Received pollution report #${++reportCount}: Source: ${report.source_id}, Pollutant: ${report.pollutant_ppm}`);
+            }
+            catch (error) {
+                console.error('[Water] Error processing uploaded reports: ', error);
+            }
+        });
+
+        call.on('end', () => {
+            try {
+                console.log(`[Water] Completed receiving pollution reports. Total reports: ${reportCount}`);
+
+                if (reportCount === 0) {
+                    return callback({
+                        code: grpc.status.INVALID_ARGUMENT,
+                        message: 'No readings received'
+                    });
+                }
+                const max_pollutant = Math.max(...readings.map(r => r.pollutant_ppm));
+                const event_id = `EVT-${Date.now()}`;
+                console.log(`[Water] Event logged: ${event_id} reported with max pollutant level: ${max_pollutant}ppm`);
+
+                callback(null, {
+                    event_id,
+                    readings_logged: reportCount,
+                    max_pollutant: parseFloat(max_pollutant.toFixed(2))
+                });
+            }
+            catch (error) {
+                console.error('[Water] Error analysing ReportPollutionEvent stream:', error);
+                callback({
+                    code: grpc.status.INTERNAL,
+                    message: 'Internal server error while analysing readings'
+                });
+            }
+        });
+        call.on('error', (err) => {
+            console.error(`[Water] Error receiving pollution reports: ${err.message}`);
+        });
+    }
+    catch (error) {
+        console.error('[Water] Error processing ReportPollutionEvent data: ', error);
+        callback({
             code: grpc.status.INTERNAL,
             message: 'Internal server error'
         });
@@ -251,8 +251,8 @@ function main(){
 
     server.addService(water_proto.WaterMonitor.service, {
         GetWaterQuality,
-        ReportPollutionEvent,
         StreamWaterLevels,
+        ReportPollutionEvent,
         PollutionAlertChannel
     });
 

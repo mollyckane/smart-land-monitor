@@ -71,7 +71,7 @@ function GetSoilStatus(call, callback){
     }  
 }
 
-//RPC 2: Client Streaming RPC - UploadReadingHistory
+//RPC 3: Client Streaming RPC - UploadReadingHistory
 function UploadReadingHistory(call, callback){
     try{
          console.log('[Soil] Retrieving readings from client...');
@@ -149,7 +149,7 @@ function UploadReadingHistory(call, callback){
     }
 }
 
-// RPC 3: Streaming RPC - StreamZoneMonitor
+// RPC 2: Streaming RPC - StreamZoneMonitor
 function StreamZoneMonitor(call){
     let interval;
 
@@ -254,8 +254,8 @@ function main(){
 
     server.addService(soil_proto.SoilSensor.service, {
         GetSoilStatus,
-        UploadReadingHistory,
-        StreamZoneMonitor
+        StreamZoneMonitor,
+        UploadReadingHistory
     });
 
     server.bindAsync('0.0.0.0:50053', grpc.ServerCredentials.createInsecure(), (err, port)=>{

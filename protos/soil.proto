@@ -4,8 +4,8 @@ package soil;
 
 service SoilSensor{
   rpc GetSoilStatus(SoilRequest) returns (SoilStatus){}
-  rpc UploadReadingHistory(stream SoilReading) returns (AnalysisResult){}
   rpc StreamZoneMonitor(SoilRequest) returns (stream SoilStatus){}
+  rpc UploadReadingHistory(stream SoilReading) returns (AnalysisResult){}
 }
 
 message SoilRequest{

@@ -4,8 +4,8 @@ package water;
 
 service WaterMonitor{
   rpc GetWaterQuality(WaterRequest) returns (WaterQuality){}
-  rpc ReportPollutionEvent(stream PollutionReading) returns (PollutionAlert){}
   rpc StreamWaterLevels(WaterRequest) returns (stream WaterLevel){}
+   rpc ReportPollutionEvent(stream PollutionReading) returns (PollutionAlert){}
   rpc PollutionAlertChannel(stream MonitorRequest) returns (stream PollutionAlert){}
 }
 
