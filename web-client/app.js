@@ -322,9 +322,11 @@ app.get('/water/stream', (req, res) => {
 app.post('/water/pollution', (req, res) => {
     if (!waterClient) return res.status(503).json({ error: 'Water Tracker not available' });
 
-    const source_id = req.body.source_id || 'RiverAlpha';
-    const pollutant = parseFloat(req.body.pollutant_ppm) || 8.5;
-    const readings = parseInt(req.body.readings) || 3;
+    const { readings } =req.body;
+
+    if(!readings || readings.length === 0){
+        return res.status(400).json({ error: 'No readings provided '});
+    }
 
     const call = waterClient.ReportPollutionEvent(
         (err, result) => {
@@ -334,13 +336,11 @@ app.post('/water/pollution', (req, res) => {
 
     //build readings using the user's inputted pollutant level
     //add slight variation to each reading to make it realistic
-    for (let i = 0; i < readings; i++) {
-        call.write({
-            source_id,
-            pollutant_ppm: parseFloat((pollutant + (Math.random() * 2 - 1)).toFixed(2)),
-            timestamp: new Date().toISOString()
-        });
-    }
+    readings.forEach(r => call.write({
+        source_id: r.source_id,
+        pollutant_ppm: r.pollutant_ppm,
+        timestamp: new Date().toISOString()
+    }));
     call.end();
 });
 

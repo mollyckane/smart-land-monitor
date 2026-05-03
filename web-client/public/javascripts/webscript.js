@@ -6,8 +6,6 @@
 
 */
 
-const app = require("../../app");
-
 //helper methods
 function setOutput(id, html) {
     document.getElementById(id).innerHTML = html;
@@ -289,20 +287,40 @@ function streamWaterLevels(){
     source.onerror = () => { source.close(); };
 }
 
-//3. Client Streaming RPC: PollutionReport
-async function reportPollutionEvent() {
+//helper methods for pollution report
+const queuedReadings=[];
+
+function addReading(){
     const source_id = document.getElementById('water-source-pollution').value;
     const pollutant_ppm = parseFloat(document.getElementById('water-pollutant').value);
-    const readings = parseInt(document.getElementById('water-readings').value) || 3;
+
+    if(!source_id || isNaN(pollutant_ppm)){ return; }
+
+    queuedReadings.push({ source_id, pollutant_ppm, timestamp: new Date().toISOString() });
+    renderQueue();
+}
+
+function renderQueue(){
+    const list= document.getElementById('report-queue');
+    list.innerHTML = queuedReadings.map(r => `<li>${r.source_id} - ${r.pollutant_ppm}ppm`).join(''); 
+
+    list.style.display = queuedReadings.length > 0 ? 'flex' : 'none';
+}
+
+//3. Client Streaming RPC: PollutionReport
+async function reportPollutionEvent() {
+    if(queuedReadings.length === 0) return;
 
     try {
         const res = await fetch('/water/pollution', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ source_id, pollutant_ppm, readings })
+            body: JSON.stringify({ readings: queuedReadings })
         });
         const data = await res.json();
         setOutput('water-output-pollution', formatJSON(data));
+        queuedReadings.length=0;
+        renderQueue();
     }
     catch (error) {
         setOutput('water-output-pollution', `<p class="output-err">Error: ${error.message}</p>`)

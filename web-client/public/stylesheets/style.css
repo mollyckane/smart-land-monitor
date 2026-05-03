@@ -88,6 +88,16 @@ header button {
 
 header button:hover {
   transform: translateY(-1px);
+  border: 4px solid #1c9969;
+}
+.quote{
+  text-align: center;
+  width: 80%;
+  margin: 0 auto;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: var(--shadow-sm);
 }
 
 main {
@@ -429,7 +439,17 @@ p.output-warn, div.output-line{
   font-weight: 600;
 }
 
-
+#report-queue{
+  display: none;
+  flex-wrap: wrap;
+  white-space: wrap;
+  font-size: 0.7rem;
+  padding-left: 1rem;
+  column-gap: 2rem;
+  max-height: 90px;
+  overflow: auto;
+  margin-top:0;
+}
 
 @media (max-width: 900px) {
   header {
@@ -444,6 +464,9 @@ p.output-warn, div.output-line{
     flex-wrap: wrap;
   }
 
+  .quote{
+    font-size: 1.1rem;
+  }
   .logo{
     font-size:1rem;
   }
