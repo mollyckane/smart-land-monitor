@@ -93,13 +93,20 @@ header button:hover {
 main {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 20px 28px 56px;
+  padding: 20px 28px 36px;
   display: flex;
   flex-direction: column;
 }
 
 a {
   color: #00B7FF;
+}
+
+footer{
+  display: flex;
+  justify-content: center;
+  padding-bottom: 2rem;
+  font-size: 0.8rem;
 }
 
 .logo {
@@ -368,6 +375,12 @@ section.status-bar{
   border-color: rgba(220, 38, 38, 0.2);
 }
 
+p.output-warn, div.output-line{
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .output {
   background: color-mix(in oklch, var(--color-bg) 60%, var(--color-surface-offset));
   border: 1px solid rgba(0, 0, 0, 0.07);
@@ -417,6 +430,7 @@ section.status-bar{
 }
 
 
+
 @media (max-width: 900px) {
   header {
     padding: 1rem;
@@ -448,4 +462,10 @@ section.status-bar{
     flex-direction: column;
   }
 
+  footer{
+    display: flex;
+    flex-wrap: wrap;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.761);
+  }
 }
