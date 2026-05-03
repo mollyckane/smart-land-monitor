@@ -197,13 +197,13 @@ app.post('/forest/alerts', (req, res) => {
     }
 
     const location = req.body.location || 'Amazon Rainforest';
-    const alert_type = req.body.alert_type || 'FIRE';
-    const threshold = parseFloat(req.body.threshold) || 75;
+    const humidity_threshold = parseFloat(req.body.humidity_threshold) || 75;
+    const co2_threshold = parseFloat(req.body.co2_threshold) || 350;
 
     forestAlertCall.write({
         location,
-        alert_type,
-        threshold
+        humidity_threshold,
+        co2_threshold
     });
 
     res.json({ message: 'Forest alert config sent' });
@@ -289,7 +289,7 @@ app.post('/water/quality', (req, res) => {
     });
 });
 
-//rpc 3: stream water levels
+//rpc 2: stream water levels
 app.get('/water/stream', (req, res) => {
     if (!waterClient) return res.status(503).json({ error: 'Water Tracker not available' });
     const source_id = req.query.source_id || 'RiverAlpha';
@@ -318,13 +318,13 @@ app.get('/water/stream', (req, res) => {
     req.on('close', () => call.cancel());
 });
 
-//rpc 2: client streaming — report a pollution event with multiple readings
+//rpc 3: client streaming — report a pollution event with multiple readings
 app.post('/water/pollution', (req, res) => {
     if (!waterClient) return res.status(503).json({ error: 'Water Tracker not available' });
 
     const source_id = req.body.source_id || 'RiverAlpha';
     const pollutant = parseFloat(req.body.pollutant_ppm) || 8.5;
-    const count = parseInt(req.body.count) || 3;
+    const readings = parseInt(req.body.readings) || 3;
 
     const call = waterClient.ReportPollutionEvent(
         (err, result) => {
@@ -334,7 +334,7 @@ app.post('/water/pollution', (req, res) => {
 
     //build readings using the user's inputted pollutant level
     //add slight variation to each reading to make it realistic
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < readings; i++) {
         call.write({
             source_id,
             pollutant_ppm: parseFloat((pollutant + (Math.random() * 2 - 1)).toFixed(2)),
