@@ -4,13 +4,13 @@
 <head>
   <title>Smart Land Monitor</title>
   <link rel='stylesheet' href='/stylesheets/style.css' />
-  <link rel="icon" href="/images/light-bulb.png">
+  <link rel="icon" href="/images/green-bulb.png">
 </head>
 
 <body>
   <header>
     <div class="header-inner">
-      <div class="logo"><img src="https://img.icons8.com/?size=100&id=12198&format=png&color=000000" class="icons">
+      <div class="logo"><img src="images/green-bulb.png" class="icons">
         Smart Land Health Monitor
       </div>
       <button onclick="discoverServices()">Press here to discover active services</button>
@@ -26,17 +26,17 @@
     <!-- Services Status Bar -->
     <section class="status-bar">
       <div class="status-item" id="status-forest"><img
-          src="https://img.icons8.com/?size=100&id=17593&format=png&color=000000" class="icons"> Forest Monitor <span
+          src="images/forest.png" class="icons"> Forest Monitor <span
           class="badge badge-unknown">Unknown</span></div>
       <div class="status-item" id="status-soil"><img
-          src="https://img.icons8.com/?size=100&id=WdpOiowt42I7&format=png&color=000000" class="icons"> Soil Sensor
+          src="images/soil.png" class="icons"> Soil Sensor
         <span class="badge badge-unknown">Unknown</span>
       </div>
       <div class="status-item" id="status-water"><img
-          src="https://img.icons8.com/?size=100&id=13101&format=png&color=000000" class="icons"> Water Monitor <span
+          src="images/water.png" class="icons"> Water Monitor <span
           class="badge badge-unknown">Unknown</span></div>
       <div class="status-item" id="status-naming"><img
-          src="https://img.icons8.com/?size=100&id=110286&format=png&color=000000" class="icons"> Naming Service <span
+          src="images/service.png" class="icons"> Naming Service <span
           class="badge badge-unknown">Unknown</span></div>
     </section>
 
@@ -45,7 +45,7 @@
       <!-- FOREST -->
       <div class="card forest green">
         <div class="card-header">
-          <span class="card-icon green"><img src="https://img.icons8.com/?size=100&id=17593&format=png&color=000000"
+          <span class="card-icon green"><img src="images/forest.png"
               class="icons"></span>
           <div>
             <h2>Forest Monitor</h2>
@@ -58,13 +58,37 @@
           <input type="text" id="forest-location" value="Amazon Rainforest" placeholder="e.g. Amazon">
         </div>
 
+        <!-- unary and streaming -->
         <div class="btn-group">
-          <button class="btn btn-green" onclick="getForestReading()">📊 Get Reading</button>
-          <button class="btn btn-blue" onclick="streamForest()">📡 Live Stream</button>
+          <button class="btn btn-green" onclick="getForestReading()"><img src="images/reading.png" class="icons-btn"> Get Reading</button>
+          <button class="btn btn-blue" onclick="streamForestReadings()"><img src="images/signal.png" class="icons-btn"> Live Stream</button>
         </div>
 
         <div class="output" id="forest-output">
           <p class="placeholder">Click a button to get data...</p>
+        </div>
+
+        <!-- alerts -->
+        <div class="input-group">
+          <label>Forest Zone</label>
+          <input type="text" id="forest-location-alerts" value="Amazon Rainforest" placeholder="e.g. Amazon">
+        </div>
+        <div class="input-group">
+          <label>Humidity Threshold %</label>
+          <input type="number" id="forest-humidity-threshold" value="80" placeholder="e.g. 80">
+        </div>
+        <div class="input-group">
+          <label>CO2 Threshold (ppm)</label>
+          <input type="number" id="forest-co2-threshold" value="410" placeholder="e.g. 410">
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-orange" onclick="startForestAlerts()"><img src="images/stopwatch.png" class="icons-btn">Start Alerts</button>
+          <button class="btn btn-orange" onclick="sendForestAlertConfig()"><img src="images/pass-fail.png" class="icons-btn"> Check Thresholds</button>
+        </div>
+
+        <div class="output" id="forest-output-alerts">
+          <p class="placeholder">Start alerts then check thresholds...</p>
         </div>
       </div>
       <!-- FOREST end -->
@@ -72,7 +96,7 @@
       <!-- SOIL -->
       <div class="card soil amber">
         <div class="card-header">
-          <span class="card-icon amber"><img src="https://img.icons8.com/?size=100&id=WdpOiowt42I7&format=png&color=000000"
+          <span class="card-icon amber"><img src="images/soil.png"
               class="icons"></span>
           <div>
             <h2>Soil Sensor</h2>
@@ -86,9 +110,9 @@
         </div>
       
         <div class="btn-group">
-          <button class="btn btn-green" onclick="getSoilStatus()">📊 Get Status</button>
-          <button class="btn btn-blue" onclick="streamSoil()">📡 Live Stream</button>
-          <button class="btn btn-orange" onclick="uploadSoilData()">📤 Upload History</button>
+          <button class="btn btn-green" onclick="getSoilStatus()"><img src="images/reading.png" class="icons-btn">Get Status</button>
+          <button class="btn btn-blue" onclick="streamSoilZone()"><img src="images/signal.png" class="icons-btn"> Live Stream</button>
+          <button class="btn btn-orange" onclick="uploadSoilHistory()"><img src="images/upload.png" class="icons-btn"> Upload History</button>
         </div>
       
         <div class="output" id="soil-output">
@@ -100,7 +124,7 @@
       <!-- WATER -->
       <div class="card water">
         <div class="card-header">
-          <span class="card-icon blue"><img src="https://img.icons8.com/?size=100&id=13101&format=png&color=000000" class="icons"></span>
+          <span class="card-icon blue"><img src="images/water.png" class="icons"></span>
           <div>
             <h2>Water Monitor</h2>
             <p class="card-desc">Water quality & pollution detection</p>
@@ -111,32 +135,56 @@
           <label>Water Source</label>
           <input type="text" id="water-source" value="RiverAlpha" placeholder="e.g. RiverAlpha">
         </div>
-      
-        <div class="input-group">
-          <label>Pollutant Level (ppm)</label>
-          <input type="number" id="water-pollutant" value="8.5" step="0.1" placeholder="e.g. 8.5">
-        </div>
-        
-        <div class="input-group">
-          <label>Number of Readings to Report</label>
-          <input type="number" id="water-readings" value="3" min="1" max="10" placeholder="e.g. 3">
-        </div>
 
         <div class="btn-group">
-          <button class="btn btn-green" onclick="getWaterQuality()">📊 Get Quality</button>
-          <button class="btn btn-blue" onclick="streamWater()">📡 Stream Levels</button>
-          <button class="btn btn-red" onclick="reportPollution()">⚠️ Report Pollution</button>
+          <button class="btn btn-green" onclick="getWaterQuality()"><img src="images/reading.png" class="icons-btn"> Get Quality</button>
+          <button class="btn btn-blue" onclick="streamWaterLevels()"><img src="images/signal.png" class="icons-btn"> Stream Levels</button>
         </div>
 
         <div class="output" id="water-output">
           <p class="placeholder">Click a button to get data...</p>
+        </div>
+
+        <div class="input-group">
+          <label>Water Source</label>
+          <input type="text" id="water-source-pollution" value="RiverAlpha" placeholder="e.g. RiverAlpha">
+        </div>
+        <div class="input-group">
+          <label>Pollutant Level (ppm)</label>
+          <input type="number" id="water-pollutant" value="8.5" step="0.1" placeholder="e.g. 8.5">
+        </div>
+        <div class="input-group">
+          <label>Number of Readings to Report</label>
+          <input type="number" id="water-readings" value="3" min="1" max="10" placeholder="e.g. 3">
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-red" onclick="reportPollutionEvent()"><img src="images/error.png" class="icons-btn"> Report Pollution</button>
+        </div>
+        <div class="output" id="water-output-pollution">
+          <p class="placeholder">Submit a pollution report...</p>
+        </div>
+
+        <div class="input-group">
+          <label>Water Source</label>
+          <input type="text" id="water-source-alert" value="RiverAlpha" placeholder="e.g. RiverAlpha">
+        </div>
+        <div class="input-group">
+          <label>Alert Threshold (ppm)</label>
+          <input type="number" id="water-alert-threshold" value="5" step="0.1" placeholder="e.g. 8.5">
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-orange" onclick="startWaterAlerts()"><img src="images/stopwatch.png" class="icons-btn"> Start Alerts</button>
+          <button class="btn btn-orange" onclick="sendWaterAlerts()"><img src="images/pass-fail.png" class="icons-btn"> Check Thresholds</button>
+        </div>
+        <div class="output" id="water-output-alert">
+          <p class="placeholder">Start alerts then check thresholds...</p>
         </div>
       </div>
       <!-- WATER end -->
        <!-- NAMING -->
       <div class="card card-full naming">
         <div class="card-header">
-          <span class="card-icon">🗂️</span>
+          <span class="card-icon"><img src="images/service.png" class="icons-btn"></span>
           <div>
             <h2>Naming Service Registry</h2>
             <p class="card-desc">All registered services in the network</p>
@@ -147,9 +195,8 @@
         </div>
       </div>
     </section>
-    
   </main>
-  <script src="/javascripts/webscript.js"></script>
+<script src="/javascripts/webscript.js"></script> 
 </body>
 
 </html>

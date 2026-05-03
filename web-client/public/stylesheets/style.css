@@ -217,7 +217,6 @@ section.status-bar{
   border: var(--border);
   border-radius: var(--radius);
   padding: 2rem;
-  justify-content: space-evenly;
   transition: var(--transition);
   height: auto;
   gap: 1rem;
@@ -330,6 +329,9 @@ section.status-bar{
   transition: all var(--transition);
   white-space: nowrap;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+.icons-btn{
+  height:1.2rem;
 }
 
 .btn:hover {
