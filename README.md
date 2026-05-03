@@ -28,23 +28,37 @@ acts as a mission control dashboard to control and monitor all services.
 ## Project Structure
 ```
 smart-land-monitor/
-├── .gitignore
-├── client/
-│   └── guiClient.js
-├── naming/
-│   └── namingService.js
-├── package-lock.json
-├── package.json
-├── protos/
-│   ├── forest.proto
-│   ├── naming.proto
-│   ├── soil.proto
-│   └── water.proto
-├── README.md
-└── services/
-    ├── forestService.js
-    ├── soilService.js
-    └── waterService.js
+    ├── protos/
+    │   ├── forest.proto
+    │   ├── naming.proto
+    │   ├── soil.proto
+    │   ├── water.proto
+    ├── services/
+    │   ├── forestService.js
+    │   ├── namingService.js
+    │   ├── soilService.js
+    │   ├── waterService.js
+    ├── web-client/
+    │   ├── bin/
+    │   │   ├── www
+    │   ├── public/
+    │   │   ├── images/
+    │   │   ├── javascripts/
+    │   │   │   ├── webscript.js
+    │   │   ├── stylesheets/
+    │   │   │   └── style.css
+    │   ├── routes/
+    │   │   ├── index.js
+    │   ├── views/
+    │   │   ├── error.ejs
+    │   │   └── index.ejs
+    │   ├── app.js
+    │   ├── package-lock.json
+    │   └── package.json
+    ├── package-lock.json
+    ├── package.json
+    └── README.md
+
 ```
 
 ---
@@ -87,6 +101,8 @@ npm install
 Open a **separate terminal for each** of the following:
 
 ```bash
+#0. cd into smart-land-monitor, then run the following:
+
 # 1. Start the Naming Service first
 npm run naming
 # or 
@@ -129,7 +145,7 @@ node web-client/bin/www
 ## Features
 - Service registration and discovery via Naming Service
 - All 4 gRPC communication styles
-- Remote error handling and deadline management
+- Remote error handling
 - GUI client for service discovery and control
 - Real-time data streaming
 
