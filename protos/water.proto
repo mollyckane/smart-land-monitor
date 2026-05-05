@@ -5,7 +5,7 @@ package water;
 service WaterMonitor{
   rpc GetWaterQuality(WaterRequest) returns (WaterQuality){}
   rpc StreamWaterLevels(WaterRequest) returns (stream WaterLevel){}
-   rpc ReportPollutionEvent(stream PollutionReading) returns (PollutionAlert){}
+  rpc ReportPollutionEvent(stream PollutionReading) returns (PollutionEventSummary){}
   rpc PollutionAlertChannel(stream MonitorRequest) returns (stream PollutionAlert){}
 }
 
@@ -20,6 +20,12 @@ message WaterQuality{
   string status=4;
 }
 
+message PollutionEventSummary{
+  string event_id=1;
+  int32 readings_logged=2;
+  double max_pollutant=3;
+}
+
 message PollutionReading{
   string source_id=1;
   double pollutant_ppm=2;
@@ -27,9 +33,12 @@ message PollutionReading{
 }
 
 message PollutionAlert{
-  string event_id=1;
-  int32 readings_logged=2;
-  double max_pollutant=3;
+  string source_id = 1;
+  double pollutant_ppm = 2;
+  double alert_threshold_ppm = 3;
+  string message = 4;
+  string severity = 5;
+  string timestamp = 6;
 }
 
 message WaterLevel{
@@ -41,5 +50,4 @@ message WaterLevel{
 message MonitorRequest{
   string source_id=1;
   double alert_threshold_ppm=2;
-  string message=3;
 }

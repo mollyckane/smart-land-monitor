@@ -189,11 +189,30 @@ function PollutionAlertChannel(call) {
             const { source_id, alert_threshold_ppm } = config;
             const status = generateWaterQuality(source_id);
 
+            console.log(`[Water] Received alert config for ${source_id} with threshold ${alert_threshold_ppm} ppm`);
+
             if (status.pollutant_ppm >alert_threshold_ppm) {
-                call.write({
-                    event_id: `EVT-${Date.now()}`,
-                    readings_logged: 1,
-                    max_pollutant: status.pollutant_ppm
+                call.on('data', (config) => {
+                    const { source_id, alert_threshold_ppm } = config;
+                    const status = generateWaterQuality(source_id);
+
+                    if (status.pollutant_ppm > alert_threshold_ppm) {
+                        const severity=status.pollutant_ppm > alert_threshold_ppm + 3 ? 'HIGH' : 'MEDIUM';
+                        console.log( `[Water] Alert sent for ${source_id}: pollutant ${status.pollutant_ppm} ppm exceeded threshold ${alert_threshold_ppm} ppm`);
+
+                        call.write({
+                            source_id,
+                            pollutant_ppm: status.pollutant_ppm,
+                            alert_threshold_ppm,
+                            message: `Pollution threshold exceeded at ${source_id}`,
+                            severity,
+                            timestamp: new Date().toISOString()
+                        });
+                    } else{
+                        console.log(
+                            `[Water] No alert for ${source_id}: pollutant ${status.pollutant_ppm} ppm did not exceed threshold ${alert_threshold_ppm} ppm`
+                        );
+                    }
                 });
             }
         });
