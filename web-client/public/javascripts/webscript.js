@@ -132,7 +132,7 @@ function streamForestReadings(){
 
 //3. Bidirectional Streaming RPC: MonitorAlertChannel
 function startForestAlerts(){
-    setOutput('forest-output-alerts', '');
+    setOutput('forest-output-alerts', 'Forest alert stream started. Waiting for alerts...');
     const source = new EventSource('/forest/alerts');
 
     source.onmessage = (event) => {
@@ -155,14 +155,14 @@ function startForestAlerts(){
 
 async function sendForestAlertConfig(){
     const location = document.getElementById('forest-location-alerts').value;
-    const humidity = parseFloat(document.getElementById('forest-humidity-threshold').value);
+    const humidity_threshold = parseFloat(document.getElementById('forest-humidity-threshold').value);
     const co2_threshold = parseFloat(document.getElementById('forest-co2-threshold').value);
     
     try{
         const res = await fetch ('/forest/alerts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
-            body: JSON.stringify({ location, humidity_threshold: humidity, co2_threshold })
+            body: JSON.stringify({ location, humidity_threshold, co2_threshold })
         });
         const data = await res.json();
         setOutput('forest-output-alerts', formatJSON(data));
@@ -329,9 +329,11 @@ async function reportPollutionEvent() {
 
 //4. Bidirectional RPC: PollutionAlertChanel
 function startWaterAlerts(){
-    setOutput('water-output-alert', '');
+    setOutput('water-output-alert', 'Water alert stream started. Waiting for alerts...');
 
     const source = new EventSource('/water/alerts');
+
+    
 
     source.onmessage = (event) => {
         try {
@@ -355,13 +357,13 @@ function startWaterAlerts(){
 
 async function sendWaterAlerts() {
     const source_id = document.getElementById('water-source-alert').value;
-    const alert_threshold= parseFloat(document.getElementById('water-alert-threshold').value);
+    const alert_threshold_ppm= parseFloat(document.getElementById('water-alert-threshold').value);
 
     try {
         const res = await fetch('/water/alerts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ source_id, alert_threshold })
+            body: JSON.stringify({ source_id, alert_threshold_ppm })
         });
         const data = await res.json();
         setOutput('water-output-alert', formatJSON(data));
