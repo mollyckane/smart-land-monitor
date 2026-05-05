@@ -56,6 +56,17 @@ function sendSseEvent(clients, payload) {
     });
 }
 
+//helper method for metadata and deadline
+function createGrpcContext(type = 'rpc') {
+    const metadata = new grpc.Metadata();
+    metadata.add('client', 'gui-dashboard');
+    metadata.add('request-type', type);
+
+    const deadline = new Date();
+    deadline.setSeconds(deadline.getSeconds() + 5);
+
+    return { metadata, options: { deadline } };
+}
 
 //------ discover services --------
 function discoverServices() {
@@ -116,10 +127,19 @@ app.get('/', (req, res) => {
 //rpc 1: get current reading (unary)
 app.post('/forest/reading', (req, res) => {
     if (!forestClient) return res.status(503).json({ error: 'Forest Monitor not available' });
-    const location = req.body.location || 'Amazon Rainforest';
+    const location = req.body.location;
+
+    if (!location) { 
+        console.error('[Web Client] Forest reading  request rejected: Location is required');
+        return res.status(400).json({ error: 'Location is required' }); 
+    }
+
+    const { metadata, options } = createGrpcContext('unary');
 
     forestClient.GetCurrentReading(
         { location },
+        metadata,
+        options,
         (err, response) => {
             if (err) return res.status(500).json({ error: err.message });
         res.json(response);
@@ -129,14 +149,23 @@ app.post('/forest/reading', (req, res) => {
 //rpc 2: stream forest monitoring (server streaming)
 app.get('/forest/stream', (req, res) => {
     if (!forestClient) return res.status(503).json({ error: 'Forest Monitor not available' });
-    const location = req.query.location || 'ZoneA';
+    const location = req.query.location;
+
+    if (!location) {
+        console.error('[Web Client] Forest stream request rejected: Location is required');
+        return res.status(400).json({ error: 'Location is required' });
+    }
 
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
+    const { metadata, options } = createGrpcContext('stream');
+
     const call = forestClient.StreamLiveReadings(
-        { location }
+        { location },
+        metadata,
+        options
     );
 
     call.on('data', (reading) => {
@@ -167,6 +196,13 @@ app.get('/forest/alerts', (req, res) => {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
 
+    const { metadata, options } = createGrpcContext('bidi');
+
+    const call = forestClient.MonitorAlertChannel(
+        metadata,
+        options
+    );
+
     forestAlertCall = forestClient.MonitorAlertChannel();
 
     forestAlertCall.on('data', function (alert) {
@@ -196,7 +232,12 @@ app.post('/forest/alerts', (req, res) => {
         return res.status(400).json({ error: 'Forest alert stream not started' });
     }
 
-    const location = req.body.location || 'Amazon Rainforest';
+    const location = req.body.location;
+    if (!location) {
+        console.error('[Web Client] Forest alert request rejected: Location is required');
+        return res.status(400).json({ error: 'Location is required' });
+    }
+
     const humidity_threshold = parseFloat(req.body.humidity_threshold) || 75;
     const co2_threshold = parseFloat(req.body.co2_threshold) || 350;
 
@@ -213,7 +254,12 @@ app.post('/forest/alerts', (req, res) => {
 //rpc 1: get soil status (unary)
 app.post('/soil/status', (req, res) => {
     if (!soilClient) return res.status(503).json({ error: 'Soil Sensor not available' });
-    const zone_id = req.body.zone_id || 'ZoneB';
+    const zone_id = req.body.zone_id;
+
+    if (!zone_id) {
+        console.error('[Web Client] Soil status request rejected: Location is required');
+        return res.status(400).json({ error: 'Location is required' });
+    }
 
     soilClient.GetSoilStatus(
         { zone_id },
@@ -226,7 +272,12 @@ app.post('/soil/status', (req, res) => {
 //rpc 2: stream soil sensor (streaming)
 app.get('/soil/stream', (req, res) => {
     if (!soilClient) return res.status(503).json({ error: 'Soil Sensor not available' });
-    const zone_id = req.query.zone_id || 'ZoneB';
+    const zone_id = req.query.zone_id;
+
+    if (!zone_id) {
+        console.error('[Web Client] Soil streaming request rejected: Location is required');
+        return res.status(400).json({ error: 'Location is required' });
+    }
 
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
@@ -255,7 +306,12 @@ app.get('/soil/stream', (req, res) => {
 //rpc 3: upload 5 simulated historical readings (client streaming)
 app.post('/soil/upload', (req, res) => {
     if (!soilClient) return res.status(503).json({ error: 'Soil Sensor not available' });
-    const zone_id = req.body.zone_id || 'ZoneB';
+    const zone_id = req.body.zone_id;
+
+    if (!zone_id) {
+        console.error('[Web Client] Soil historical upload request rejected: Location is required');
+        return res.status(400).json({ error: 'Location is required' });
+    }
 
     const call = soilClient.UploadReadingHistory(
         (err, result) => {
@@ -279,7 +335,12 @@ app.post('/soil/upload', (req, res) => {
 //rpc 1: get water quality (unary)
 app.post('/water/quality', (req, res) => {
     if (!waterClient) return res.status(503).json({ error: 'Water Tracker not available' });
-    const source_id = req.body.source_id || 'RiverAlpha';
+    const source_id = req.body.source_id;
+
+    if (!source_id) {
+        console.error('[Web Client] Water quality request rejected: Location is required');
+        return res.status(400).json({ error: 'Location is required' });
+    }
 
     waterClient.GetWaterQuality(
         { source_id },
@@ -292,7 +353,12 @@ app.post('/water/quality', (req, res) => {
 //rpc 2: stream water levels
 app.get('/water/stream', (req, res) => {
     if (!waterClient) return res.status(503).json({ error: 'Water Tracker not available' });
-    const source_id = req.query.source_id || 'RiverAlpha';
+    const source_id = req.query.source_id;
+
+    if (!source_id) {
+        console.error('[Web Client] Water streaming request rejected: Location is required');
+        return res.status(400).json({ error: 'Location is required' });
+    }
 
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
@@ -385,12 +451,17 @@ app.post('/water/alerts', (req, res) => {
         return res.status(400).json({ error: 'Water alert stream not started' });
     }
 
-    const source_id = req.body.source_id || 'RiverAlpha';
-    const threshold_ppm = parseFloat(req.body.threshold_ppm) || 8.5;
+    const source_id = req.body.source_id;
+    if (!source_id) {
+        console.error('[Web Client] Water alert request rejected: Location is required');
+        return res.status(400).json({ error: 'Location is required' });
+    }
+
+    const alert_threshold_ppm = parseFloat(req.body.alert_threshold_ppm) || 8.5;
 
     waterAlertCall.write({
         source_id,
-        threshold_ppm
+        alert_threshold_ppm
     });
 
     res.json({ message: 'Water monitor request sent' });
