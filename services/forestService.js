@@ -149,9 +149,10 @@ function MonitorAlertChannel(call){
         console.log('[Forest] MonitorAlertChannel bidirectional stream started');
 
         call.on('data', (request)=>{
+            
             try{
                 const { location, humidity_threshold, co2_threshold} = request;
-            
+
                 //guard clause
                 if(!location){
                     call.write({
@@ -166,27 +167,42 @@ function MonitorAlertChannel(call){
             const normalisedLocation=location.toLowerCase();
             const data = getForestData(normalisedLocation);
 
-            console.log(`[Forest] MonitorForest checking thresholds for ${normalisedLocation}`);
+                console.log(`[Forest] Received alert config for ${normalisedLocation} | humidity threshold: ${humidity_threshold} | CO2 threshold: ${co2_threshold}`);
+                let alertSent=false;
 
              //check the humidity levels
             if(data.humidity < humidity_threshold){
+                console.log(
+                    `[Forest] Humidity alert sent for ${normalisedLocation}: ${data.humidity}% below ${humidity_threshold}%`
+                );
+                
                 call.write({
                     location: normalisedLocation,
-                    message: `Humidity ${data.humidity.toFixed(2)}% is below threshold ${humidity_threshold.toFixed(2)}%`,
+                    message: `Humidity ${data.humidity}% is below threshold ${humidity_threshold}%`,
                     severity: (humidity_threshold - data.humidity) > 20 ? 'HIGH' : 'MEDIUM',
                     timestamp: new Date().toISOString()
                 });
+                alertSent=true;
              }
              
             //check the CO2 levels
             if(data.co2_level > co2_threshold){
+                console.log(`[Forest] CO2 alert sent for ${normalisedLocation}: ${data.co2_level}ppm above ${co2_threshold}ppm`
+                );
+
                 call.write({
                     location: normalisedLocation,
-                    message: `CO2 level ${data.co2_level.toFixed(2)}ppm is above threshold ${co2_threshold.toFixed(2)}ppm`,
+                    message: `CO2 level ${data.co2_level}ppm is above threshold ${co2_threshold}ppm`,
                     severity: (data.co2_level - co2_threshold) > 50 ? 'CRITICAL' : 'WARNING',
                     timestamp: new Date().toISOString()
                 });
+                alertSent=true;
              }
+             if (!alertSent) {
+                    console.log(
+                        `[Forest] No alert for ${normalisedLocation}: humidity ${data.humidity}%, CO2 ${data.co2_level}ppm within thresholds`
+                    );
+                }
             }
             catch(error){
                 console.error('[Forest] Error processing MonitorAlertChannel data:', error);
