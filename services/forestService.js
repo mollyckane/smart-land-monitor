@@ -65,6 +65,11 @@ function GetCurrentReading(call, callback){
         //log in console
         console.log(`[Forest] Current reading for ${location}: Humidity: ${reading.humidity}%, CO2: ${reading.co2_level}ppm, O2: ${reading.oxygen_level}% at ${reading.timestamp}`);
 
+        const meta = call.metadata.getMap();
+        console.log(`[Forest] Metadata received -> client: ${meta.client}, request-type: ${meta['request-type']}`);
+
+        
+
         callback(null, reading);
     }
     catch(error){
