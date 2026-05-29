@@ -91,7 +91,7 @@ by the client and other services.
 ### Installation
 
 ```bash
-git clone https://github.com/mollyckane/smart-land-monitor.git
+git clone https://github.com/yourusername/smart-land-monitor.git
 cd smart-land-monitor
 npm install
 ```
